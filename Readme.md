@@ -2,7 +2,7 @@
 
 Ce projet configure un serveur Apache sécurisé avec deux méthodes :
 1. Utilisation de Docker Compose.
-2. Utilisation d'un script complet pour une installation directe sur un système Linux.
+2. Utilisation d'un script complet pour une installation directe sur un système Linux (ne fonctionne pas).
 
 ## Structure du Projet
 
