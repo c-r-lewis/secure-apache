@@ -1,0 +1,8 @@
+# Restreindre l'accès à certains utilisateurs
+AuthType Basic
+AuthName "Restricted Area"
+AuthUserFile /etc/apache2/.htpasswd
+Require valid-user
+
+# Interdire l'affichage des noms de fichiers
+Options -Indexes

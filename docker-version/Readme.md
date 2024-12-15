@@ -109,8 +109,8 @@ Le script `init.sh` initialise le serveur Apache, crée le fichier `.htpasswd` s
    Clonez le dépôt sur votre machine locale :
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone git@github.com:c-r-lewis/secure-apache.git
+   cd secure-apache
    ```
 
 2. **Construire et Exécuter les Services**
