@@ -11,7 +11,7 @@ PHP_DOMAIN="phpmyadmin.local"
 # Function to uninstall Apache
 uninstall_apache() {
     echo "Uninstalling Apache..."
-    sudo systemctl stop apache2
+    sudo systemctl stop apache2 --quiet
     sudo apt-get remove --purge -y apache2 apache2-bin apache2-data libapache2-mod-security2 php-mysql php libapache2-mod-php
     sudo apt-get autoremove -y
     sudo apt-get clean
@@ -32,7 +32,7 @@ uninstall_apache() {
 # Function to uninstall MySQL
 uninstall_mysql() {
     echo "Uninstalling MySQL..."
-    sudo systemctl stop mysql
+    sudo systemctl stop mysql --quiet
     sudo apt-get remove --purge -y mysql-server
     sudo apt-get autoremove -y
     sudo apt-get clean
@@ -46,6 +46,7 @@ uninstall_mysql() {
 # Function to uninstall phpMyAdmin
 uninstall_phpmyadmin() {
     echo "Uninstalling phpMyAdmin..."
+    export DEBIAN_FRONTEND=noninteractive
     sudo apt-get remove --purge -y phpmyadmin
     sudo apt-get autoremove -y
     sudo apt-get clean
@@ -56,9 +57,9 @@ uninstall_phpmyadmin() {
 # Function to update /etc/hosts
 update_hosts_file() {
     echo "Updating /etc/hosts file..."
-    sudo sed -i "/$SITE1_DOMAIN/d" /etc/hosts
-    sudo sed -i "/$SITE2_DOMAIN/d" /etc/hosts
-    sudo sed -i "/$PHP_DOMAIN/d" /etc/hosts
+    sudo sed -i -s "/$SITE1_DOMAIN/d" /etc/hosts
+    sudo sed -i -s "/$SITE2_DOMAIN/d" /etc/hosts
+    sudo sed -i -s "/$PHP_DOMAIN/d" /etc/hosts
 
     echo "/etc/hosts file updated successfully."
 }

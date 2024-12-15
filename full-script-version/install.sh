@@ -8,23 +8,53 @@ SITE1_DOMAIN="site1.local"
 SITE2_DOMAIN="site2.local"
 PHP_DOMAIN="phpmyadmin.local"
 
+# Function to forcefully release dpkg lock
+force_release_lock() {
+    echo "Forcefully releasing dpkg lock..."
+    sudo rm -f /var/lib/dpkg/lock-frontend
+    sudo rm -f /var/lib/dpkg/lock
+    sudo rm -f /var/cache/apt/archives/lock
+    sudo dpkg --configure -a
+    sudo apt-get update
+}
+
+# Function to wait for dpkg lock to be released
+wait_for_lock() {
+    for i in {1..10}; do
+        if ! sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; then
+            return 0
+        fi
+        echo "Waiting for dpkg lock to be released... ($i/10)"
+        sleep 5
+    done
+    echo "dpkg lock not released. Forcefully releasing..."
+    force_release_lock
+}
+
 # Function to install Apache
 install_apache() {
     echo "Installing Apache..."
+    wait_for_lock
     sudo apt-get update
-    sudo apt-get install -y apache2 apache2-bin apache2-data libapache2-mod-security2 php-mysql php libapache2-mod-php
-    sudo apt-get clean
+    sudo apt-get install -y apache2 apache2-utils ssl-cert
 
-    # Configure timezone
-    sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime
-    echo "Europe/Paris" | sudo tee /etc/timezone
+    # Ensure Apache2 utilities are installed
+    sudo apt-get install -y apache2-bin
 
     # Enable necessary modules
     sudo a2enmod ssl
     sudo a2enmod headers
     sudo a2enmod rewrite
-    sudo a2enmod security2
+    sudo a2enmod security
     sudo a2enmod proxy proxy_http proxy_fcgi
+
+    # Ensure SSL certificate file exists
+    if [ ! -f /etc/ssl/certs/ssl-cert-snakeoil.pem ]; then
+        echo "SSL certificate file does not exist. Generating it..."
+        sudo mkdir -p /etc/ssl/private
+        sudo chmod 700 /etc/ssl/private
+        sudo make-ssl-cert generate-default-snakeoil --force-overwrite
+    fi
 
     # Copy configuration files
     sudo cp ./config/apache2.conf /etc/apache2/apache2.conf
@@ -47,13 +77,15 @@ install_apache() {
     sudo a2ensite 000-default.conf
     sudo a2ensite default-ssl.conf
 
-    # Create the .htpasswd file if necessary
+    # Create .htpasswd file non-interactively
+    echo "Creating .htpasswd..."
     if [ ! -f /etc/apache2/.htpasswd ]; then
-        echo "Creating .htpasswd..."
-        sudo htpasswd -cb /etc/apache2/.htpasswd ${HTPASSWD_USER} ${HTPASSWD_PASS}
+        echo "admin:adminpassword" | sudo htpasswd -bc /etc/apache2/.htpasswd admin adminpassword
+    else
+        echo "admin:adminpassword" | sudo htpasswd -b /etc/apache2/.htpasswd admin adminpassword
     fi
 
-    # Test Apache configuration before starting it
+    # Test Apache configuration
     echo "Testing Apache configuration..."
     sudo apache2ctl configtest
 
@@ -65,34 +97,28 @@ install_apache() {
 # Function to install MySQL
 install_mysql() {
     echo "Installing MySQL..."
-    sudo apt-get update
+    wait_for_lock
     sudo apt-get install -y mysql-server
-    sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${MYSQL_ROOT_PASSWORD}'; FLUSH PRIVILEGES;"
-    sudo systemctl restart mysql
+    sudo systemctl start mysql
 }
 
 # Function to install phpMyAdmin
 install_phpmyadmin() {
     echo "Installing phpMyAdmin..."
-    sudo apt-get update
+    wait_for_lock
+    export DEBIAN_FRONTEND=noninteractive
     sudo apt-get install -y phpmyadmin
-    sudo phpenmod mbstring
     sudo systemctl restart apache2
-
-    # Configure phpMyAdmin
-    sudo mysql -e "CREATE DATABASE phpmyadmin DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;"
-    sudo mysql -e "GRANT ALL PRIVILEGES ON phpmyadmin.* TO 'pma'@'localhost' IDENTIFIED BY '${PHP_MYADMIN_PASSWORD}';"
-    sudo mysql -e "FLUSH PRIVILEGES;"
 }
 
 # Function to update /etc/hosts
 update_hosts_file() {
     echo "Updating /etc/hosts file..."
-    LOCAL_IP=$(hostname -I | awk '{print $1}')
     sudo sed -i "/$SITE1_DOMAIN/d" /etc/hosts
     sudo sed -i "/$SITE2_DOMAIN/d" /etc/hosts
     sudo sed -i "/$PHP_DOMAIN/d" /etc/hosts
-    echo "$LOCAL_IP $SITE1_DOMAIN $SITE2_DOMAIN $PHP_DOMAIN" | sudo tee -a /etc/hosts
+    echo "127.0.0.1 $SITE1_DOMAIN $SITE2_DOMAIN $PHP_DOMAIN" | sudo tee -a /etc/hosts
+    echo "/etc/hosts file updated successfully."
 }
 
 # Main script
@@ -101,7 +127,7 @@ main() {
     install_mysql
     install_phpmyadmin
     update_hosts_file
-    echo "Script completed successfully."
+    echo "Install script completed successfully."
 }
 
 # Run the main script
