@@ -1,13 +1,12 @@
 #!/bin/bash
 
+# Source the config.env file to load environment variables
+source ./config.env
+
 # Variables
 SITE1_DOMAIN="site1.local"
 SITE2_DOMAIN="site2.local"
 PHP_DOMAIN="phpmyadmin.local"
-MYSQL_ROOT_PASSWORD="your_mysql_root_password"
-PHP_MYADMIN_PASSWORD="your_phpmyadmin_password"
-HTPASSWD_USER="your_htpasswd_user"
-HTPASSWD_PASS="your_htpasswd_pass"
 
 # Function to install Apache
 install_apache() {
@@ -68,7 +67,7 @@ install_mysql() {
     echo "Installing MySQL..."
     sudo apt-get update
     sudo apt-get install -y mysql-server
-    sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;"
+    sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${MYSQL_ROOT_PASSWORD}'; FLUSH PRIVILEGES;"
     sudo systemctl restart mysql
 }
 
@@ -82,7 +81,7 @@ install_phpmyadmin() {
 
     # Configure phpMyAdmin
     sudo mysql -e "CREATE DATABASE phpmyadmin DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;"
-    sudo mysql -e "GRANT ALL PRIVILEGES ON phpmyadmin.* TO 'pma'@'localhost' IDENTIFIED BY '$PHP_MYADMIN_PASSWORD';"
+    sudo mysql -e "GRANT ALL PRIVILEGES ON phpmyadmin.* TO 'pma'@'localhost' IDENTIFIED BY '${PHP_MYADMIN_PASSWORD}';"
     sudo mysql -e "FLUSH PRIVILEGES;"
 }
 
