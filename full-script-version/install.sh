@@ -63,7 +63,7 @@ install_apache() {
     sudo cp ./config/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
     sudo cp ./config/site1.conf /etc/apache2/sites-available/site1.conf
     sudo cp ./config/site2.conf /etc/apache2/sites-available/site2.conf
-    sudo cp ./config/phpmyadmin.conf /etc/apache2/sites-available/phpmyadmin.conf
+    sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
     sudo cp ./config/.htaccess /var/www/html/.htaccess
 
     # Copy site files
@@ -73,9 +73,12 @@ install_apache() {
     # Enable sites
     sudo a2ensite site1.conf
     sudo a2ensite site2.conf
-    sudo a2ensite phpmyadmin.conf
+    sudo a2ensite database.conf
     sudo a2ensite 000-default.conf
     sudo a2ensite default-ssl.conf
+
+    # Reload systemd manager configuration
+    sudo systemctl daemon-reload
 
     # Create .htpasswd file non-interactively
     echo "Creating .htpasswd..."
@@ -91,8 +94,10 @@ install_apache() {
 
     # Start Apache
     echo "Starting Apache..."
+    sudo systemctl reload apache2
     sudo systemctl restart apache2
 }
+
 
 # Function to install MySQL
 install_mysql() {
@@ -104,12 +109,11 @@ install_mysql() {
 
 # Function to install phpMyAdmin
 install_phpmyadmin() {
-    echo "Installing phpMyAdmin..."
-    wait_for_lock
-    export DEBIAN_FRONTEND=noninteractive
-    sudo apt-get install -y phpmyadmin
-    sudo systemctl restart apache2
+    echo 'Not completed'
 }
+
+
+
 
 # Function to update /etc/hosts
 update_hosts_file() {
@@ -123,10 +127,10 @@ update_hosts_file() {
 
 # Main script
 main() {
-    install_apache
+    #install_apache
     install_mysql
-    install_phpmyadmin
-    update_hosts_file
+    #install_phpmyadmin
+    #update_hosts_file
     echo "Install script completed successfully."
 }
 

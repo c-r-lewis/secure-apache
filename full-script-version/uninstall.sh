@@ -47,12 +47,26 @@ uninstall_mysql() {
 uninstall_phpmyadmin() {
     echo "Uninstalling phpMyAdmin..."
     export DEBIAN_FRONTEND=noninteractive
+
+    # Remove phpMyAdmin package
     sudo apt-get remove --purge -y phpmyadmin
+
+    # Remove any residual configuration files
     sudo apt-get autoremove -y
     sudo apt-get clean
 
+    # Remove Composer-related files and directories
+    sudo rm -rf /usr/share/phpmyadmin/vendor
+    sudo rm -rf /usr/share/phpmyadmin/composer.json
+    sudo rm -rf /usr/share/phpmyadmin/composer.lock
+
+    # Remove any additional phpMyAdmin-related files
+    sudo rm -rf /etc/phpmyadmin
+    sudo rm -rf /var/lib/phpmyadmin
+
     echo "phpMyAdmin uninstalled successfully."
 }
+
 
 # Function to update /etc/hosts
 update_hosts_file() {

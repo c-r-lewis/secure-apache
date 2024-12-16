@@ -2,7 +2,7 @@
 
 Ce projet configure un serveur Apache sécurisé avec deux méthodes :
 1. Utilisation de Docker Compose.
-2. Utilisation d'un script complet pour une installation directe sur un système Linux (ne fonctionne pas).
+2. Utilisation d'un script complet pour une installation directe sur un système Linux (ne fonctionne pas entièrement).
 
 ## Structure du Projet
 
@@ -181,7 +181,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
    - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
 
-### Full-Script Version (cette version ne marche pas)
+### Full-Script Version (cette version ne marche pas entièrement)
 
 1. **Cloner le Dépôt**
 
@@ -211,7 +211,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
    - **Serveur Apache** : Accédez au serveur Apache à l'adresse `http://localhost` ou `https://localhost`.
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
-   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
+   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`. (Ne focntionne pas)
 
 4. **Désinstaller les Services**
 
