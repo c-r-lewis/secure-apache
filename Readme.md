@@ -1,8 +1,8 @@
-# Serveur Apache Sécurisé
+### Serveur Apache Sécurisé
 
 Ce projet configure un serveur Apache sécurisé avec deux méthodes :
 1. Utilisation de Docker Compose.
-2. Utilisation d'un script complet pour une installation directe sur un système Linux (ne fonctionne pas).
+2. Utilisation d'un script complet pour une installation directe sur un système Linux.
 
 ## Structure du Projet
 
@@ -145,9 +145,23 @@ Les fichiers de configuration Apache se trouvent dans le répertoire `config`. C
 
 Le script `install.sh` installe et configure Apache, MySQL, et phpMyAdmin sur un système Linux. Il crée également le fichier `.htpasswd` et démarre le service Apache.
 
+**Options de `install.sh` :**
+- `-s` : Exécute le script en mode silencieux (les logs ne sont pas affichés dans le terminal mais sont écrits dans `installation_log.txt`).
+- `-c` : Efface le fichier de log `installation_log.txt` avant de commencer l'installation.
+
+**Fichier de log :**
+- `installation_log.txt` : Contient les logs de l'installation. Une ligne de séparation avec la date est ajoutée au début du fichier de log avant de commencer l'installation.
+
 #### `uninstall.sh`
 
 Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie les configurations associées.
+
+**Options de `uninstall.sh` :**
+- `-s` : Exécute le script en mode silencieux (les logs ne sont pas affichés dans le terminal mais sont écrits dans `uninstall_log.txt`).
+- `-c` : Efface le fichier de log `uninstall_log.txt` avant de commencer la désinstallation.
+
+**Fichier de log :**
+- `uninstall_log.txt` : Contient les logs de la désinstallation. Une ligne de séparation avec la date est ajoutée au début du fichier de log avant de commencer la désinstallation.
 
 ## Utilisation
 
@@ -181,7 +195,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
    - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
 
-### Full-Script Version (cette version ne marche pas)
+### Full-Script Version
 
 1. **Cloner le Dépôt**
 
