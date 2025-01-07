@@ -83,6 +83,17 @@ MYSQL_PASSWORD=password
 PMA_HOST=mysql
 ```
 
+#### `install.sh`
+
+Le script `install.sh` installe et configure Apache, MySQL, et phpMyAdmin sur un système Linux. Il crée également le fichier `.htpasswd` et démarre le service Apache.
+
+**Options de `install.sh` :**
+- `-s` : Exécute le script en mode silencieux (les logs ne sont pas affichés dans le terminal mais sont écrits dans `installation_log.txt`).
+- `-c` : Efface le fichier de log `installation_log.txt` avant de commencer l'installation.
+
+**Fichier de log :**
+- `installation_log.txt` : Contient les logs de l'installation. Une ligne de séparation avec la date est ajoutée au début du fichier de log avant de commencer l'installation.
+
 ### Docker Version
 
 #### `docker-compose.yml`
@@ -144,17 +155,6 @@ Le script `init.sh` initialise le serveur Apache, crée le fichier `.htpasswd` s
 #### Configuration Apache
 
 Les fichiers de configuration Apache se trouvent dans le répertoire `config`. Ces fichiers configurent le serveur Apache, y compris les hôtes virtuels et les paramètres SSL.
-
-#### `install.sh`
-
-Le script `install.sh` installe et configure Apache, MySQL, et phpMyAdmin sur un système Linux. Il crée également le fichier `.htpasswd` et démarre le service Apache.
-
-**Options de `install.sh` :**
-- `-s` : Exécute le script en mode silencieux (les logs ne sont pas affichés dans le terminal mais sont écrits dans `installation_log.txt`).
-- `-c` : Efface le fichier de log `installation_log.txt` avant de commencer l'installation.
-
-**Fichier de log :**
-- `installation_log.txt` : Contient les logs de l'installation. Une ligne de séparation avec la date est ajoutée au début du fichier de log avant de commencer l'installation.
 
 #### `uninstall.sh`
 
