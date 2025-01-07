@@ -197,6 +197,10 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
 ### Full-Script Version
 
+### ⚠️ Warning
+> Cette version ne fonctionne pas correctement. En raison des difficultés rencontrées pour configurer et installer plusieurs environnements de test, je n'ai pas pu perfectionner le script.
+
+
 1. **Cloner le Dépôt**
 
    Clonez le dépôt sur votre machine locale :
