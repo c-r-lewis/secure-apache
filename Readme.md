@@ -4,6 +4,10 @@ Ce projet configure un serveur Apache sécurisé avec deux méthodes :
 1. Utilisation de Docker Compose.
 2. Utilisation d'un script complet pour une installation directe sur un système Linux.
 
+### ⚠️ Attention
+> La version script complet ne fonctionne pas correctement. En raison des difficultés rencontrées pour configurer et installer plusieurs environnements de test, je n'ai pas pu perfectionner le script.
+
+
 ## Structure du Projet
 
 ### Docker Version
@@ -197,7 +201,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
 ### Full-Script Version
 
-### ⚠️ Warning
+### ⚠️ Attention
 > Cette version ne fonctionne pas correctement. En raison des difficultés rencontrées pour configurer et installer plusieurs environnements de test, je n'ai pas pu perfectionner le script.
 
 
