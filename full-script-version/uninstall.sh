@@ -29,6 +29,27 @@ progress_bar() {
     echo "Everything is uninstalled!"
 }
 
+# Function to check for locks
+check_locks() {
+    if fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; then
+        echo "Package manager is locked by another process. Please resolve the lock and try again."
+        exit 1
+    fi
+}
+
+# Function to preconfigure dbconfig-common
+preconfigure_dbconfig_common() {
+    echo "Preconfiguring dbconfig-common..."
+    echo "phpmyadmin phpmyadmin/dbconfig-remove boolean true" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/app-password-confirm password " | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/mysql/admin-pass password " | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/mysql/app-pass password " | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/dbconfig-reinstall boolean false" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/remove boolean true" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/purge boolean true" | sudo debconf-set-selections
+}
+
 # Function to uninstall Apache
 uninstall_apache() {
     echo "Uninstalling Apache..."
@@ -72,6 +93,29 @@ uninstall_phpmyadmin() {
     echo "Uninstalling phpMyAdmin..."
     export DEBIAN_FRONTEND=noninteractive
 
+    # Preconfigure dbconfig-common to avoid any interaction with MySQL
+    echo "phpmyadmin phpmyadmin/dbconfig-remove boolean true" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/mysql/admin-pass password " | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/mysql/app-pass password " | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/dbconfig-reinstall boolean false" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | sudo debconf-set-selections
+    echo "phpmyadmin phpmyadmin/dbconfig-commited boolean true" | sudo debconf-set-selections # Disable database dump
+
+    # Check if MySQL service is active and installed
+    if ! systemctl is-active --quiet mysql && ! dpkg-query -W -f='${Status}' mysql-server 2>/dev/null | grep -q "install ok installed"; then
+        echo "MySQL is not installed or not running. Skipping MySQL-related steps..."
+        
+        # Skip all database-related actions if MySQL is not running
+        echo "phpmyadmin phpmyadmin/dbconfig-remove boolean true" | sudo debconf-set-selections
+        echo "phpmyadmin phpmyadmin/mysql/admin-pass password " | sudo debconf-set-selections
+        echo "phpmyadmin phpmyadmin/mysql/app-pass password " | sudo debconf-set-selections
+        echo "phpmyadmin phpmyadmin/dbconfig-reinstall boolean false" | sudo debconf-set-selections
+        echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | sudo debconf-set-selections
+    else
+        # Ensure MySQL server is stopped if installed and running
+        sudo systemctl stop mysql --quiet
+    fi
+
     # Force remove phpmyadmin if it fails
     if ! sudo apt-get remove --purge -y phpmyadmin; then
         echo "Error uninstalling phpMyAdmin. Attempting to force remove..."
@@ -100,6 +144,9 @@ uninstall_phpmyadmin() {
 }
 
 
+
+
+
 # Function to update /etc/hosts
 update_hosts_file() {
     echo "Updating /etc/hosts file..."
@@ -116,6 +163,7 @@ main() {
     echo "--------------------------------------------------"
     echo "Starting new uninstallation at $(date)"
     echo "--------------------------------------------------"
+    check_locks
     uninstall_phpmyadmin
     uninstall_apache
     uninstall_mysql

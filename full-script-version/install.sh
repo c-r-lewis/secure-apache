@@ -55,87 +55,105 @@ wait_for_lock() {
 install_apache() {
     echo "Installing Apache..."
     wait_for_lock
+
+    # Update package list and install required packages
     sudo apt-get update
-    sudo apt-get install -y apache2 apache2-utils ssl-cert
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 apache2-utils ssl-cert apache2-bin
 
-    # Ensure Apache2 utilities are installed
-    sudo apt-get install -y apache2-bin
+    # Enable necessary Apache modules
+    sudo a2enmod ssl headers rewrite proxy proxy_http proxy_fcgi
 
-    # Enable necessary modules
-    sudo a2enmod ssl
-    sudo a2enmod headers
-    sudo a2enmod rewrite
-    sudo a2enmod security
-    sudo a2enmod proxy proxy_http proxy_fcgi
-
-    # Ensure SSL certificate file exists
+    # Ensure SSL certificate exists
     if [ ! -f /etc/ssl/certs/ssl-cert-snakeoil.pem ]; then
         echo "SSL certificate file does not exist. Generating it..."
-        sudo mkdir -p /etc/ssl/private
-        sudo chmod 700 /etc/ssl/private
         sudo make-ssl-cert generate-default-snakeoil --force-overwrite
     fi
 
     # Copy configuration files
-    sudo cp ./config/apache2.conf /etc/apache2/apache2.conf
-    sudo cp ./config/ports.conf /etc/apache2/ports.conf
-    sudo cp ./config/000-default.conf /etc/apache2/sites-available/000-default.conf
-    sudo cp ./config/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
-    sudo cp ./config/site1.conf /etc/apache2/sites-available/site1.conf
-    sudo cp ./config/site2.conf /etc/apache2/sites-available/site2.conf
-    sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
-    sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
-    sudo cp ./config/.htaccess /var/www/html/.htaccess
+    echo "Copying configuration files..."
+    CONFIG_DIR="./config"
+    SITE_DIR="./html"
+    if [ -d "$CONFIG_DIR" ]; then
+        sudo cp "$CONFIG_DIR/apache2.conf" /etc/apache2/apache2.conf
+        sudo cp "$CONFIG_DIR/ports.conf" /etc/apache2/ports.conf
+        sudo cp "$CONFIG_DIR/000-default.conf" /etc/apache2/sites-available/000-default.conf
+        sudo cp "$CONFIG_DIR/default-ssl.conf" /etc/apache2/sites-available/default-ssl.conf
+        sudo cp "$CONFIG_DIR/site1.conf" /etc/apache2/sites-available/site1.conf
+        sudo cp "$CONFIG_DIR/site2.conf" /etc/apache2/sites-available/site2.conf
+        sudo cp "$CONFIG_DIR/database.conf" /etc/apache2/sites-available/database.conf
+        sudo cp "$CONFIG_DIR/.htaccess" /var/www/html/.htaccess
+    else
+        echo "Configuration directory $CONFIG_DIR not found!"
+        exit 1
+    fi
 
     # Copy site files
-    sudo cp -r ./html/site1 /var/www/site1
-    sudo cp -r ./html/site2 /var/www/site2
+    echo "Copying site files..."
+    if [ -d "$SITE_DIR" ]; then
+        sudo cp -r "$SITE_DIR/site1" /var/www/site1
+        sudo cp -r "$SITE_DIR/site2" /var/www/site2
+    else
+        echo "Site directory $SITE_DIR not found!"
+        exit 1
+    fi
+
+    # Ensure log directory exists
+    sudo mkdir -p /var/log/apache2
+    sudo chown www-data:www-data /var/log/apache2
 
     # Enable sites
-    sudo a2ensite site1.conf
-    sudo a2ensite site2.conf
-    sudo a2ensite database.conf
-    sudo a2ensite database.conf
-    sudo a2ensite 000-default.conf
-    sudo a2ensite default-ssl.conf
+    echo "Enabling Apache sites..."
+    sudo a2ensite 000-default.conf default-ssl.conf site1.conf site2.conf database.conf
 
-    # Reload systemd manager configuration
+    # Reload systemd configuration and restart Apache
+    echo "Reloading systemd configuration and restarting Apache..."
     sudo systemctl daemon-reload
-
-    # Reload systemd manager configuration
-    sudo systemctl daemon-reload
+    sudo systemctl restart apache2
 
     # Create .htpasswd file non-interactively
     echo "Creating .htpasswd..."
-    if [ ! -f /etc/apache2/.htpasswd ]; then
-        echo "admin:adminpassword" | sudo htpasswd -bc /etc/apache2/.htpasswd admin adminpassword
+    HTPASSWD_FILE="/etc/apache2/.htpasswd"
+    if [ ! -f "$HTPASSWD_FILE" ]; then
+        sudo htpasswd -bc "$HTPASSWD_FILE" admin adminpassword
     else
-        echo "admin:adminpassword" | sudo htpasswd -b /etc/apache2/.htpasswd admin adminpassword
+        sudo htpasswd -b "$HTPASSWD_FILE" admin adminpassword
     fi
 
     # Test Apache configuration
     echo "Testing Apache configuration..."
-    sudo apache2ctl configtest
+    if ! sudo apache2ctl configtest; then
+        echo "Apache configuration test failed. Please review the configuration files."
+        exit 1
+    fi
 
-    # Start Apache
-    echo "Starting Apache..."
+    # Reload Apache to apply changes
+    echo "Reloading Apache to apply changes..."
     sudo systemctl reload apache2
-    sudo systemctl reload apache2
-    sudo systemctl restart apache2
+
+    echo "Apache installation and configuration completed successfully."
 }
 
 
-# Function to install MySQL
-install_mysql() {
-    echo "Installing MySQL..."
+# Function to install PHP
+install_php() {
+    echo "Installing PHP..."
     wait_for_lock
-    sudo apt-get install -y mysql-server
-    sudo systemctl start mysql
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y php libapache2-mod-php php-mysql
+    sudo systemctl restart apache2
 }
 
 # Function to install phpMyAdmin
 install_phpmyadmin() {
-    echo 'Not completed'
+    echo "Installing phpMyAdmin..."
+    wait_for_lock
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password adminpassword"
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password adminpassword"
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password adminpassword"
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y phpmyadmin
+    sudo phpenmod mbstring
+    sudo systemctl restart apache2
 }
 
 # Function to update /etc/hosts
@@ -180,9 +198,10 @@ main() {
     echo "--------------------------------------------------"
 
     install_apache
-    install_mysql
+    #install_php
     #install_phpmyadmin
-    update_hosts_file
+    #install_mysql
+    #update_hosts_file
     echo "Install script completed successfully."
 }
 
@@ -208,7 +227,7 @@ if [ "$CLEAR_LOG" = true ]; then
 fi
 
 # Run installation checks
-check_already_installed
+#check_already_installed
 
 # Run the main script
 if [ "$SILENT_MODE" = true ]; then
