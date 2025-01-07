@@ -67,6 +67,7 @@ install_apache() {
     sudo cp ./config/site1.conf /etc/apache2/sites-available/site1.conf
     sudo cp ./config/site2.conf /etc/apache2/sites-available/site2.conf
     sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
+    sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
     sudo cp ./config/.htaccess /var/www/html/.htaccess
 
     # Copy site files
@@ -77,8 +78,12 @@ install_apache() {
     sudo a2ensite site1.conf
     sudo a2ensite site2.conf
     sudo a2ensite database.conf
+    sudo a2ensite database.conf
     sudo a2ensite 000-default.conf
     sudo a2ensite default-ssl.conf
+
+    # Reload systemd manager configuration
+    sudo systemctl daemon-reload
 
     # Reload systemd manager configuration
     sudo systemctl daemon-reload
@@ -98,8 +103,10 @@ install_apache() {
     # Start Apache
     echo "Starting Apache..."
     sudo systemctl reload apache2
+    sudo systemctl reload apache2
     sudo systemctl restart apache2
 }
+
 
 # Function to install MySQL
 install_mysql() {

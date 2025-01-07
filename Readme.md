@@ -225,7 +225,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
    - **Serveur Apache** : Accédez au serveur Apache à l'adresse `http://localhost` ou `https://localhost`.
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
-   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
+   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`. (Ne focntionne pas)
 
 4. **Désinstaller les Services**
 
