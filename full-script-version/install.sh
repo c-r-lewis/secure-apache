@@ -11,6 +11,23 @@ LOG_FILE="installation_log.txt"
 SILENT_MODE=false
 CLEAR_LOG=false
 
+progress_bar() {
+    local pid=$1
+    local delay=0.5
+    local width=100
+    local char="-"
+    local progress=0
+
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local progress=$((progress + 1))
+        local bar=$(printf "%-${width}s" | tr ' ' "$char")
+        echo -ne "\rProgress: [${bar:0:$((progress % (width + 1)))}]"
+        sleep $delay
+    done
+    echo # Move to the next line
+    echo "Everything is installed!"
+}
+
 # Function to forcefully release dpkg lock
 force_release_lock() {
     echo "Forcefully releasing dpkg lock..."
@@ -195,7 +212,8 @@ check_already_installed
 
 # Run the main script
 if [ "$SILENT_MODE" = true ]; then
-    (main 2>&1 | tee -a "$LOG_FILE") > /dev/null
+    (main >> "$LOG_FILE" 2>&1) &
+    progress_bar $!
 else
     main 2>&1 | tee -a "$LOG_FILE"
 fi
