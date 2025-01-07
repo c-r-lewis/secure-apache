@@ -7,6 +7,9 @@ source ./config.env
 SITE1_DOMAIN="site1.local"
 SITE2_DOMAIN="site2.local"
 PHP_DOMAIN="phpmyadmin.local"
+LOG_FILE="installation_log.txt"
+SILENT_MODE=false
+CLEAR_LOG=false
 
 # Function to forcefully release dpkg lock
 force_release_lock() {
@@ -63,7 +66,7 @@ install_apache() {
     sudo cp ./config/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
     sudo cp ./config/site1.conf /etc/apache2/sites-available/site1.conf
     sudo cp ./config/site2.conf /etc/apache2/sites-available/site2.conf
-    sudo cp ./config/phpmyadmin.conf /etc/apache2/sites-available/phpmyadmin.conf
+    sudo cp ./config/database.conf /etc/apache2/sites-available/database.conf
     sudo cp ./config/.htaccess /var/www/html/.htaccess
 
     # Copy site files
@@ -73,9 +76,12 @@ install_apache() {
     # Enable sites
     sudo a2ensite site1.conf
     sudo a2ensite site2.conf
-    sudo a2ensite phpmyadmin.conf
+    sudo a2ensite database.conf
     sudo a2ensite 000-default.conf
     sudo a2ensite default-ssl.conf
+
+    # Reload systemd manager configuration
+    sudo systemctl daemon-reload
 
     # Create .htpasswd file non-interactively
     echo "Creating .htpasswd..."
@@ -91,6 +97,7 @@ install_apache() {
 
     # Start Apache
     echo "Starting Apache..."
+    sudo systemctl reload apache2
     sudo systemctl restart apache2
 }
 
@@ -104,11 +111,7 @@ install_mysql() {
 
 # Function to install phpMyAdmin
 install_phpmyadmin() {
-    echo "Installing phpMyAdmin..."
-    wait_for_lock
-    export DEBIAN_FRONTEND=noninteractive
-    sudo apt-get install -y phpmyadmin
-    sudo systemctl restart apache2
+    echo 'Not completed'
 }
 
 # Function to update /etc/hosts
@@ -121,14 +124,71 @@ update_hosts_file() {
     echo "/etc/hosts file updated successfully."
 }
 
+is_installed() {
+    dpkg -l | grep -q "$1"
+}
+
+check_already_installed() {
+    # Check if Apache is already installed
+    if is_installed "apache2"; then
+        echo "Apache is already installed. Please run the uninstallation script first."
+        exit 1
+    fi
+
+    # Check if MySQL is already installed
+    if is_installed "mysql-server"; then
+        echo "Mysql is already installed. Please run the uninstallation script first."
+        exit 1
+    fi
+
+    # Check if phpMyAdmin is already installed
+    if is_installed "phpmyadmin"; then
+        echo "At least one of the apps is already installed. Please run the uninstallation script first."
+        exit 1
+    fi
+}
+
 # Main script
 main() {
+    # Add a separator line if the -c option is not set
+    echo "--------------------------------------------------"
+    echo "Starting new installation at $(date)"
+    echo "--------------------------------------------------"
+
     install_apache
     install_mysql
-    install_phpmyadmin
+    #install_phpmyadmin
     update_hosts_file
     echo "Install script completed successfully."
 }
 
+# Parse command-line options
+while getopts "sc" opt; do
+  case ${opt} in
+    s )
+      SILENT_MODE=true
+      ;;
+    c )
+      CLEAR_LOG=true
+      ;;
+    \? )
+      echo "Usage: $0 [-s] [-c]"
+      exit 1
+      ;;
+  esac
+done
+
+# Clear the log file if the -c option is set
+if [ "$CLEAR_LOG" = true ]; then
+    > "$LOG_FILE"
+fi
+
+# Run installation checks
+check_already_installed
+
 # Run the main script
-main
+if [ "$SILENT_MODE" = true ]; then
+    (main 2>&1 | tee -a "$LOG_FILE") > /dev/null
+else
+    main 2>&1 | tee -a "$LOG_FILE"
+fi
