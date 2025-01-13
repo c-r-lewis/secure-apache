@@ -182,10 +182,10 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
 2. **Construire et Exécuter les Services**
 
-   Exécutez le script `main.sh` pour construire et démarrer les services Docker :
+   Exécutez le script `install.sh` pour construire et démarrer les services Docker :
 
    ```bash
-   sudo ./main.sh
+   sudo ./install.sh
    ```
 
    Le script va :
@@ -198,6 +198,12 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
    - **Serveur Apache** : Accédez au serveur Apache à l'adresse `http://localhost:8090` ou `https://localhost`.
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
    - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
+
+4. **Désinstaller les services**
+  ```bash
+  sudo docker stop secure-apache
+  sudo docker rm secure-apache
+  ```
 
 ### Full-Script Version
 
@@ -233,7 +239,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
    - **Serveur Apache** : Accédez au serveur Apache à l'adresse `http://localhost` ou `https://localhost`.
    - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
-   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`. (Ne focntionne pas)
+   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`. (Ne fonctionne pas)
 
 4. **Désinstaller les Services**
 
