@@ -251,7 +251,7 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
 ## Accès Restreint
 
-Le serveur Apache est configuré pour restreindre l'accès en utilisant l'authentification HTTP de base. Le fichier `.htaccess` et le fichier `.htpasswd` sont utilisés pour appliquer cette restriction. Le script `init.sh` (Docker version) ou `install.sh` (Full-Script version) crée le fichier `.htpasswd` avec les identifiants définis dans le fichier `config.env`.
+Le serveur Apache est configuré pour restreindre l'accès en utilisant l'authentification HTTP de base. Le fichier `.htaccess` et le fichier `.htpasswd` sont utilisés pour appliquer cette restriction. Le script `install.sh` (Full-Script version ou Docker version) crée le fichier `.htpasswd` avec les identifiants définis dans le fichier `config.env`.
 
 ## Personnalisation
 
