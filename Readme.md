@@ -1,16 +1,8 @@
 ### Serveur Apache Sécurisé
 
-Ce projet configure un serveur Apache sécurisé avec deux méthodes :
-1. Utilisation de Docker Compose.
-2. Utilisation d'un script complet pour une installation directe sur un système Linux.
-
-### ⚠️ Attention
-> La version script complet ne fonctionne pas correctement. En raison des difficultés rencontrées pour configurer et installer plusieurs environnements de test, je n'ai pas pu perfectionner le script.
-
+Ce projet configure un serveur Apache sécurisé à l'aide de Docker Compose.
 
 ## Structure du Projet
-
-### Docker Version
 
 ```
 .
@@ -35,37 +27,11 @@ Ce projet configure un serveur Apache sécurisé avec deux méthodes :
 └── main.sh
 ```
 
-### Full-Script Version
-
-```
-.
-├── config
-│   ├── apache2.conf
-│   ├── ports.conf
-│   ├── 000-default.conf
-│   ├── default-ssl.conf
-│   ├── phpmyadmin.conf
-│   ├── site1.conf
-│   ├── site2.conf
-│   └── .htaccess
-├── html
-│   ├── site1
-│   └── site2
-├── config.env
-├── install.sh
-└── uninstall.sh
-```
 
 ## Prérequis
 
-### Docker Version
-
 - Docker
 - Docker Compose
-
-### Full-Script Version
-
-- Un système Linux (Ubuntu/Debian recommandé)
 
 ## Configuration
 
@@ -169,15 +135,12 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
 
 ## Utilisation
 
-### Docker Version
-
 1. **Cloner le Dépôt**
 
    Clonez le dépôt sur votre machine locale :
 
    ```bash
    git clone git@github.com:c-r-lewis/secure-apache.git
-   cd docker-version
    ```
 
 2. **Construire et Exécuter les Services**
@@ -204,50 +167,6 @@ Le script `uninstall.sh` désinstalle Apache, MySQL, et phpMyAdmin, et nettoie l
   sudo docker stop secure-apache
   sudo docker rm secure-apache
   ```
-
-### Full-Script Version
-
-### ⚠️ Attention
-> Cette version ne fonctionne pas correctement. En raison des difficultés rencontrées pour configurer et installer plusieurs environnements de test, je n'ai pas pu perfectionner le script.
-
-
-1. **Cloner le Dépôt**
-
-   Clonez le dépôt sur votre machine locale :
-
-   ```bash
-   git clone git@github.com:c-r-lewis/secure-apache.git
-   cd full-script-version
-   ```
-
-2. **Installer les Services**
-
-   Exécutez le script `install.sh` pour installer et configurer les services :
-
-   ```bash
-   sudo ./install.sh
-   ```
-
-   Le script va :
-   - Installer Apache, MySQL, et phpMyAdmin.
-   - Configurer les services.
-   - Créer le fichier `.htpasswd`.
-   - Démarrer le service Apache.
-   - Mettre à jour le fichier `/etc/hosts` pour les domaines `site1.local` et `site2.local`.
-
-3. **Accéder aux Services**
-
-   - **Serveur Apache** : Accédez au serveur Apache à l'adresse `http://localhost` ou `https://localhost`.
-   - **Sites web**: Accédez au sites web à l'adresse `site1.local`ou `site2.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`.
-   - **phpMyAdmin** : Accédez à phpMyAdmin à l'adresse `phpmyadmin.local`. Vous serez invité à entrer le nom d'utilisateur et le mot de passe définis dans le fichier `config.env`. (Ne fonctionne pas)
-
-4. **Désinstaller les Services**
-
-   Exécutez le script `uninstall.sh` pour désinstaller les services et nettoyer les configurations :
-
-   ```bash
-   sudo ./uninstall.sh
-   ```
 
 ## Accès Restreint
 

@@ -1,0 +1,106 @@
+Building and launching Docker Compose...
+#0 building with "default" instance using docker driver
+
+#1 [secure-apache internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.68kB done
+#1 DONE 0.0s
+
+#2 [secure-apache internal] load metadata for docker.io/library/debian:bullseye-slim
+#2 DONE 0.8s
+
+#3 [secure-apache internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [secure-apache  1/25] FROM docker.io/library/debian:bullseye-slim@sha256:b0c91cc181796d34c53f7ea106fbcddaf87f3e601cc371af6a24a019a489c980
+#4 DONE 0.0s
+
+#5 [secure-apache internal] load build context
+#5 transferring context: 567B done
+#5 DONE 0.0s
+
+#6 [secure-apache 21/25] RUN a2ensite phpmyadmin.conf
+#6 CACHED
+
+#7 [secure-apache 19/25] RUN a2ensite site1.conf
+#7 CACHED
+
+#8 [secure-apache 15/25] COPY ./config/phpmyadmin.conf /etc/apache2/sites-available/phpmyadmin.conf
+#8 CACHED
+
+#9 [secure-apache 13/25] COPY ./config/site1.conf /etc/apache2/sites-available/site1.conf
+#9 CACHED
+
+#10 [secure-apache 12/25] COPY ./config/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+#10 CACHED
+
+#11 [secure-apache 24/25] COPY ./scripts/init.sh /usr/local/bin/init.sh
+#11 CACHED
+
+#12 [secure-apache 20/25] RUN a2ensite site2.conf
+#12 CACHED
+
+#13 [secure-apache 14/25] COPY ./config/site2.conf /etc/apache2/sites-available/site2.conf
+#13 CACHED
+
+#14 [secure-apache 16/25] COPY ./config/.htaccess /var/www/html/.htaccess
+#14 CACHED
+
+#15 [secure-apache  7/25] RUN a2enmod security2
+#15 CACHED
+
+#16 [secure-apache  2/25] RUN apt-get update &&     DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 apache2-bin apache2-data libapache2-mod-security2     php-mysql php libapache2-mod-php &&     apt-get clean
+#16 CACHED
+
+#17 [secure-apache  3/25] RUN ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
+#17 CACHED
+
+#18 [secure-apache 22/25] RUN a2ensite 000-default.conf
+#18 CACHED
+
+#19 [secure-apache  9/25] COPY ./config/apache2.conf /etc/apache2/apache2.conf
+#19 CACHED
+
+#20 [secure-apache  5/25] RUN a2enmod headers
+#20 CACHED
+
+#21 [secure-apache 23/25] RUN a2ensite default-ssl.conf
+#21 CACHED
+
+#22 [secure-apache  6/25] RUN a2enmod rewrite
+#22 CACHED
+
+#23 [secure-apache 17/25] COPY ./html/site1 /var/www/site1
+#23 CACHED
+
+#24 [secure-apache  4/25] RUN a2enmod ssl
+#24 CACHED
+
+#25 [secure-apache 18/25] COPY ./html/site2 /var/www/site2
+#25 CACHED
+
+#26 [secure-apache  8/25] RUN a2enmod proxy proxy_http proxy_fcgi
+#26 CACHED
+
+#27 [secure-apache 11/25] COPY ./config/000-default.conf /etc/apache2/sites-available/000-default.conf
+#27 CACHED
+
+#28 [secure-apache 10/25] COPY ./config/ports.conf /etc/apache2/ports.conf
+#28 CACHED
+
+#29 [secure-apache 25/25] RUN chmod +x /usr/local/bin/init.sh
+#29 CACHED
+
+#30 [secure-apache] exporting to image
+#30 exporting layers done
+#30 writing image sha256:826531cc38a9f6e53b451c65b54e6c2e45f478fa14606282626b2903e553987d done
+#30 naming to docker.io/library/docker-version-secure-apache done
+#30 DONE 0.0s
+ Container phpmyadmin  Running
+ Container mysql  Running
+ Container secure-apache  Running
+Getting the IP address of the container...
+Container IP: 172.24.0.4
+Updating /etc/hosts file if necessary...
+/etc/hosts is already up to date.
+Script completed successfully.
